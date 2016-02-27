@@ -75,6 +75,7 @@ typedef struct _Object {
     struct _Condition condition;
     struct _DiskCacheEntry *disk_entry;
     struct _Object *next, *previous;
+    unsigned char md5_hash[16];
 } ObjectRec, *ObjectPtr;
 
 typedef struct _CacheControl {

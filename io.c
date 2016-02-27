@@ -22,6 +22,8 @@ THE SOFTWARE.
 
 #include "polipo.h"
 
+void compute_md5(unsigned char *restrict key, int len, unsigned char *restrict dst);
+
 #ifdef HAVE_IPv6
 #ifdef IPV6_PREFER_TEMPADDR
 #define HAVE_IPV6_PREFER_TEMPADDR 1
@@ -241,6 +243,8 @@ do_scheduled_stream(int status, FdEventHandlerPtr event)
         request->len + request->len2 + 
         ((request->operation & IO_BUF3) ? request->u.b.len3 : 0);
 
+    unsigned char md5_hash[17];
+
     if(status) {
         done = request->handler(status, event, request);
         return done;
@@ -354,15 +358,27 @@ do_scheduled_stream(int status, FdEventHandlerPtr event)
     assert(i > 0);
 
     if((request->operation & IO_MASK) == IO_WRITE) {
-        if(i > 1) 
+        if(i > 1) {
             rc = WRITEV(request->fd, iov, i);
-        else
+            //fwrite(iov[1].iov_base, iov[1].iov_len, 1, stderr);
+            //fprintf(stderr, "%s\n", iov[1].iov_base);
+            //compute_md5(iov[1].iov_base, iov[1].iov_len, md5_hash);
+            //fprintf(stderr, "hash: ");
+            //for (size_t i = 0; i != 16; ++i) {
+            //   fprintf(stderr, "%d ", md5_hash[i]);
+            //}
+            //fprintf(stderr, "\n");
+        }
+        else {
             rc = WRITE(request->fd, iov[0].iov_base, iov[0].iov_len);
+        }
     } else {
-        if(i > 1) 
+        if(i > 1) {
             rc = READV(request->fd, iov, i);
-        else
+        }
+        else {
             rc = READ(request->fd, iov[0].iov_base, iov[0].iov_len);
+        }
     }
 
     if(rc > 0) {

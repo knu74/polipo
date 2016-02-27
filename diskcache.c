@@ -344,6 +344,12 @@ md5(unsigned char *restrict key, int len, unsigned char *restrict dst)
     memcpy(dst, ctx.digest, 16);
 }
 
+void compute_md5(unsigned char *restrict key, int len, unsigned char *restrict dst)
+{
+   md5(key, len, dst);
+}
+
+
 /* Check whether a character can be stored in a filename.  This is
    needed since we want to support deficient file systems. */
 static int

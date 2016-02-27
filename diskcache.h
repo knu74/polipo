@@ -69,3 +69,5 @@ int revalidateDiskEntry(ObjectPtr object);
 DiskObjectPtr readDiskObject(char *filename, struct stat *sb);
 void indexDiskObjects(FILE *out, const char *root, int r);
 void expireDiskObjects(void);
+
+void compute_md5(unsigned char *restrict key, int len, unsigned char *restrict dst);

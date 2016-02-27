@@ -22,6 +22,8 @@ THE SOFTWARE.
 
 #include "polipo.h"
 
+void compute_md5(unsigned char *restrict key, int len, unsigned char *restrict dst);
+
 int mindlesslyCacheVary = 0;
 int objectHashTableSize = 0;
 int log2ObjectHashTableSize;
@@ -164,6 +166,8 @@ makeObject(int type, const void *key, int key_size, int public, int fromdisk,
     ObjectPtr object;
     int h;
 
+    fprintf(stderr, "in makeObject()\n");
+
     object = findObject(type, key, key_size);
     if(object != NULL) {
         if(public)
@@ -206,8 +210,9 @@ makeObject(int type, const void *key, int key_size, int public, int fromdisk,
     /* In order to make it more convenient to use keys as strings,
        they are NUL-terminated. */
     object->key[key_size] = '\0';
+    
     object->key_size = key_size;
-    object->flags = (public?OBJECT_PUBLIC:0) | OBJECT_INITIAL;
+    object->flags = (public ? OBJECT_PUBLIC : 0) | OBJECT_INITIAL;
     if(public) {
         h = hash(object->type, object->key, object->key_size, 
                  log2ObjectHashTableSize);
@@ -478,6 +483,13 @@ int
 objectAddData(ObjectPtr object, const char *data, int offset, int len)
 {
     int rc;
+    compute_md5((unsigned char*) data, len, object->md5_hash);
+    fprintf(stderr, "hash: \n");
+    for (int i = 0; i != 16; ++i)
+    {
+        fprintf(stderr, "%d ", object->md5_hash[i]);
+    }
+    fprintf(stderr, "\n");
 
     do_log(D_OBJECT_DATA, "Adding data to 0x%lx (%d) at %d: %d bytes\n",
            (unsigned long)object, object->length, offset, len);
