@@ -346,9 +346,6 @@ static int numArenas;
 void
 initChunks(void)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
     used_chunks = 0;
     initChunksCommon();
@@ -377,9 +374,6 @@ initChunks(void)
 static ChunkArenaPtr
 findArena()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ChunkArenaPtr arena = NULL;
     int i;
 
@@ -409,9 +403,6 @@ findArena()
 void *
 get_chunk()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     unsigned i;
     ChunkArenaPtr arena = NULL;
 
@@ -438,9 +429,6 @@ get_chunk()
 void *
 maybe_get_chunk()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     unsigned i;
     ChunkArenaPtr arena = NULL;
 
@@ -464,9 +452,6 @@ maybe_get_chunk()
 void
 dispose_chunk(void *chunk)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ChunkArenaPtr arena = NULL;
     unsigned i;
 
@@ -492,9 +477,6 @@ dispose_chunk(void *chunk)
 void
 free_chunk_arenas()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ChunkArenaPtr arena;
     int i, rc;
 
@@ -516,9 +498,6 @@ free_chunk_arenas()
 int
 totalChunkArenaSize()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ChunkArenaPtr arena;
     int i, size = 0;
 

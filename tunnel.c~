@@ -27,9 +27,6 @@ THE SOFTWARE.
 void
 do_tunnel(int fd, char *buf, int offset, int len, AtomPtr url)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n;
     assert(buf);
 
@@ -65,9 +62,6 @@ static int tunnelError(TunnelPtr, int, AtomPtr);
 static int
 circularBufferFull(CircularBufferPtr buf)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(buf->head == buf->tail - 1)
         return 1;
     if(buf->head == CHUNK_SIZE - 1 && buf->tail == 0)
@@ -78,18 +72,12 @@ circularBufferFull(CircularBufferPtr buf)
 static int
 circularBufferEmpty(CircularBufferPtr buf)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
      return buf->head == buf->tail;
 }
 
 static void
 logTunnel(TunnelPtr tunnel, int blocked)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     do_log(L_TUNNEL,"tunnel %s:%d %s\n", tunnel->hostname->string, tunnel->port,
 	   blocked ? "blocked" : "allowed");
 }
@@ -97,9 +85,6 @@ logTunnel(TunnelPtr tunnel, int blocked)
 static TunnelPtr
 makeTunnel(int fd, char *buf, int offset, int len)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel;
     assert(offset < CHUNK_SIZE);
 
@@ -129,9 +114,6 @@ makeTunnel(int fd, char *buf, int offset, int len)
 static void
 destroyTunnel(TunnelPtr tunnel)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(tunnel->fd1 < 0 && tunnel->fd2 < 0);
     releaseAtom(tunnel->hostname);
     if(tunnel->buf1.buf)
@@ -144,9 +126,6 @@ destroyTunnel(TunnelPtr tunnel)
 void 
 do_tunnel(int fd, char *buf, int offset, int len, AtomPtr url)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel;
     int port;
     char *p, *q;
@@ -218,9 +197,6 @@ do_tunnel(int fd, char *buf, int offset, int len, AtomPtr url)
 static int
 tunnelDnsHandler(int status, GethostbynameRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel = request->data;
 
     if(status <= 0) {
@@ -250,9 +226,6 @@ tunnelConnectionHandler(int status,
                         FdEventHandlerPtr event,
                         ConnectRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel = request->data;
     int rc;
 
@@ -271,9 +244,6 @@ tunnelConnectionHandler(int status,
 static int
 tunnelSocksHandler(int status, SocksRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel = request->data;
 
     if(status < 0) {
@@ -287,9 +257,6 @@ tunnelSocksHandler(int status, SocksRequestPtr request)
 static int
 tunnelHandlerParent(int fd, TunnelPtr tunnel)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char *message;
     int n;
 
@@ -332,9 +299,6 @@ tunnelHandlerParent(int fd, TunnelPtr tunnel)
 static int
 tunnelHandlerCommon(int fd, TunnelPtr tunnel)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     const char *message = "HTTP/1.1 200 Tunnel established\r\n\r\n";
 
     tunnel->fd2 = fd;
@@ -362,9 +326,6 @@ bufRead(int fd, CircularBufferPtr buf,
         int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
         void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int tail;
 
     if(buf->tail == 0)
@@ -395,9 +356,6 @@ bufWrite(int fd, CircularBufferPtr buf,
         int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
         void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(buf->head > buf->tail)
         do_stream(IO_WRITE,
                   fd, buf->tail,
@@ -414,9 +372,6 @@ bufWrite(int fd, CircularBufferPtr buf,
 static void
 tunnelDispatch(TunnelPtr tunnel)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(circularBufferEmpty(&tunnel->buf1)) {
         if(tunnel->buf1.buf && 
            !(tunnel->flags & (TUNNEL_READER1 | TUNNEL_WRITER2))) {
@@ -507,9 +462,6 @@ static int
 tunnelRead1Handler(int status, 
                    FdEventHandlerPtr event, StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel = request->data;
     if(status) {
         if(status < 0 && status != -EPIPE && status != -ECONNRESET)
@@ -531,9 +483,6 @@ static int
 tunnelRead2Handler(int status, 
                    FdEventHandlerPtr event, StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel = request->data;
     if(status) {
         if(status < 0 && status != -EPIPE && status != -ECONNRESET)
@@ -555,9 +504,6 @@ static int
 tunnelWrite1Handler(int status,
                    FdEventHandlerPtr event, StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel = request->data;
     if(status || (tunnel->flags & TUNNEL_EPIPE1)) {
         tunnel->flags |= TUNNEL_EPIPE1;
@@ -578,9 +524,6 @@ static int
 tunnelWrite2Handler(int status,
                    FdEventHandlerPtr event, StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TunnelPtr tunnel = request->data;
     if(status || (tunnel->flags & TUNNEL_EPIPE2)) {
         tunnel->flags |= TUNNEL_EPIPE2;
@@ -600,9 +543,6 @@ tunnelWrite2Handler(int status,
 static int
 tunnelError(TunnelPtr tunnel, int code, AtomPtr message)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n;
     if(tunnel->fd2 > 0) {
         CLOSE(tunnel->fd2);

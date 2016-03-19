@@ -109,9 +109,6 @@ static int idSeed;
 static int
 parseResolvConf(char *filename)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     FILE *f;
     char buf[512];
     char *p, *q;
@@ -175,9 +172,6 @@ parseResolvConf(char *filename)
 void
 preinitDns()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
 #ifdef HAVE_IPv6
     int fd;
 #endif
@@ -234,9 +228,6 @@ preinitDns()
 void
 initDns()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
 #ifndef NO_FANCY_RESOLVER
     int rc;
     struct timeval t;
@@ -276,9 +267,6 @@ do_gethostbyname(char *origname,
                  int (*handler)(int, GethostbynameRequestPtr),
                  void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ObjectPtr object;
     int n = strlen(origname);
     AtomPtr name;
@@ -412,9 +400,6 @@ do_gethostbyname(char *origname,
 static int
 dnsDelayedErrorNotifyHandler(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int done;
     GethostbynameRequestRec request =
         *(GethostbynameRequestPtr)event->data;
@@ -429,9 +414,6 @@ dnsDelayedErrorNotifyHandler(TimeEventHandlerPtr event)
 static int
 dnsDelayedDoneNotifyHandler(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int done;
     GethostbynameRequestRec request = *(GethostbynameRequestPtr)event->data;
     done = request.handler(1, &request);
@@ -445,9 +427,6 @@ dnsDelayedDoneNotifyHandler(TimeEventHandlerPtr event)
 static int
 dnsDelayedNotify(int error, GethostbynameRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr handler;
 
     if(error)
@@ -469,9 +448,6 @@ dnsDelayedNotify(int error, GethostbynameRequestPtr request)
 AtomPtr
 rfc2732(AtomPtr name)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char buf[40]; /* 8*4 (hexdigits) + 7 (colons) + 1 ('\0') */
     int rc;
     AtomPtr a = NULL;
@@ -500,9 +476,6 @@ rfc2732(AtomPtr name)
 int
 compare_hostaddr(const void *av, const void *bv)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     const HostAddressRec *a = av, *b = bv;
     int r;
     if(a->af == 4) {
@@ -526,9 +499,6 @@ compare_hostaddr(const void *av, const void *bv)
 static int
 really_do_gethostbyname(AtomPtr name, ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     struct addrinfo *ai, *entry, hints;
     int rc;
     int error, i;
@@ -669,9 +639,6 @@ really_do_gethostbyname(AtomPtr name, ObjectPtr object)
 static int
 really_do_gethostbyname(AtomPtr name, ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     struct hostent *host;
     char *s;
     AtomPtr a;
@@ -758,9 +725,6 @@ really_do_gethostbyname(AtomPtr name, ObjectPtr object)
 static int
 really_do_gethostbyname(AtomPtr name, ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     abort();
 }
 #endif
@@ -773,9 +737,6 @@ static FdEventHandlerPtr dnsSocketHandler = NULL;
 static int
 dnsHandler(int status, ConditionHandlerPtr chandler)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     GethostbynameRequestRec request = *(GethostbynameRequestPtr)chandler->data;
     ObjectPtr object = request.object;
 
@@ -796,9 +757,6 @@ dnsHandler(int status, ConditionHandlerPtr chandler)
 static int
 queryInFlight(DnsQueryPtr query)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     DnsQueryPtr other;
     other = inFlightDnsQueries;
     while(other) {
@@ -812,9 +770,6 @@ queryInFlight(DnsQueryPtr query)
 static void
 removeQuery(DnsQueryPtr query)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     DnsQueryPtr previous;
     if(query == inFlightDnsQueries) {
         inFlightDnsQueries = query->next;
@@ -837,9 +792,6 @@ removeQuery(DnsQueryPtr query)
 static void
 insertQuery(DnsQueryPtr query) 
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(inFlightDnsQueriesLast)
         inFlightDnsQueriesLast->next = query;
     else
@@ -850,9 +802,6 @@ insertQuery(DnsQueryPtr query)
 static DnsQueryPtr
 findQuery(int id, AtomPtr name)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     DnsQueryPtr query;
     query = inFlightDnsQueries;
     while(query) {
@@ -866,9 +815,6 @@ findQuery(int id, AtomPtr name)
 static int
 dnsTimeoutHandler(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     DnsQueryPtr query = *(DnsQueryPtr*)event->data;
     ObjectPtr object = query->object;
     int rc;
@@ -921,9 +867,6 @@ dnsTimeoutHandler(TimeEventHandlerPtr event)
 static int
 establishDnsSocket()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc;
 #ifdef HAVE_IPv6
     int inet6 = (nameserverAddress.sa_family == AF_INET6);
@@ -969,9 +912,6 @@ establishDnsSocket()
 static int
 sendQuery(DnsQueryPtr query)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char buf[512];
     int buflen;
     int rc;
@@ -1020,9 +960,6 @@ sendQuery(DnsQueryPtr query)
 static int
 really_do_dns(AtomPtr name, ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc;
     DnsQueryPtr query;
     AtomPtr message = NULL;
@@ -1154,9 +1091,6 @@ really_do_dns(AtomPtr name, ObjectPtr object)
 static int
 dnsReplyHandler(int abort, FdEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int fd = event->fd;
     char buf[2048];
     int len, rc;
@@ -1350,9 +1284,6 @@ dnsReplyHandler(int abort, FdEventHandlerPtr event)
 static int
 dnsGethostbynameFallback(int id, AtomPtr message)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     DnsQueryPtr query, previous;
     ObjectPtr object;
 
@@ -1423,9 +1354,6 @@ dnsGethostbynameFallback(int id, AtomPtr message)
 static int
 stringToLabels(char *buf, int offset, int n, char *string)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = offset;
     int j = 0, k = 0;
     while(1) {
@@ -1474,9 +1402,6 @@ stringToLabels(char *buf, int offset, int n, char *string)
 static int
 labelsToString(char *buf, int offset, int n, char *d, int m, int *j_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = offset, j, k;
     int ll, rc;
 
@@ -1519,9 +1444,6 @@ labelsToString(char *buf, int offset, int n, char *d, int m, int *j_return)
 static int
 dnsBuildQuery(int id, char *buf, int offset, int n, AtomPtr name, int af)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = offset;
     int type;
     switch(af) {
@@ -1550,9 +1472,6 @@ dnsBuildQuery(int id, char *buf, int offset, int n, AtomPtr name, int af)
 static int
 dnsReplyId(char *buf, int offset, int n, int *id_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(n - offset < 12)
         return -1;
     DO_NTOHS(*id_return, &buf[offset]);
@@ -1564,9 +1483,6 @@ dnsDecodeReply(char *buf, int offset, int n, int *id_return,
                AtomPtr *name_return, AtomPtr *value_return,
                int *af_return, unsigned *ttl_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = offset, j, m;
     int id = -1, b23, qdcount, ancount, nscount, arcount, rdlength;
     int class, type;
@@ -1834,9 +1750,6 @@ do { \
 static int
 really_do_dns(AtomPtr name, ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     abort();
 }
 

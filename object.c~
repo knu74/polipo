@@ -46,14 +46,6 @@ int maxObjectsWhenIdle = 32;
 int idleTime = 20;
 int dontCacheCookies = 0;
 
-
-ObjectPtr getObjectList() {
-    return object_list;
-}
-
-
-
-
 void
 preinitObject()
 {

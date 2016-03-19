@@ -29,18 +29,12 @@ AtomPtr socksParentProxy = NULL;
 void
 preinitSocks()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return;
 }
 
 void
 initSocks()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return;
 }
 
@@ -49,9 +43,6 @@ do_socks_connect(char *name, int port,
                  int (*handler)(int, SocksRequestPtr),
                  void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestRec request;
     request.name = internAtomLowerN(name, strlen(name));
     request.port = port;
@@ -92,9 +83,6 @@ static int socks5ReadHandler2(int, FdEventHandlerPtr, StreamRequestPtr);
 void
 preinitSocks()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     AtomPtr socksAuthCredentials = internAtom("");
 
     aSocks4a = internAtom("socks4a");
@@ -133,9 +121,6 @@ preinitSocks()
 static int
 socksParentProxySetter(ConfigVariablePtr var, void *value)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     configAtomSetter(var, value);
     initSocks();
     return 1;
@@ -144,9 +129,6 @@ socksParentProxySetter(ConfigVariablePtr var, void *value)
 static int
 socksProxyTypeSetter(ConfigVariablePtr var, void *value)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(*var->value.a != aSocks4a && *var->value.a != aSocks5) {
         do_log(L_ERROR, "Unknown socksProxyType %s\n", (*var->value.a)->string);
         return -1;
@@ -158,9 +140,6 @@ socksProxyTypeSetter(ConfigVariablePtr var, void *value)
 void
 initSocks()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int port = -1;
     AtomPtr host = NULL, port_atom;
     int rc;
@@ -198,9 +177,6 @@ initSocks()
 static void
 destroySocksRequest(SocksRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     releaseAtom(request->name);
     if(request->buf)
         free(request->buf);
@@ -212,9 +188,6 @@ do_socks_connect(char *name, int port,
                  int (*handler)(int, SocksRequestPtr),
                  void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = malloc(sizeof(SocksRequestRec));
     SocksRequestRec request_nomem;
     if(request == NULL)
@@ -256,9 +229,6 @@ do_socks_connect(char *name, int port,
 static int
 do_socks_connect_common(SocksRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(socksProxyAddressIndex >= 0);
 
     do_connect(retainAtom(socksProxyAddress),
@@ -271,9 +241,6 @@ do_socks_connect_common(SocksRequestPtr request)
 static int
 socksDnsHandler(int status, GethostbynameRequestPtr grequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = grequest->data;
     if(status <= 0) {
         request->handler(status, request);
@@ -306,9 +273,6 @@ socksConnectHandler(int status,
                     FdEventHandlerPtr event,
                     ConnectRequestPtr crequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = crequest->data;
     int rc;
 
@@ -385,9 +349,6 @@ socksWriteHandler(int status,
                   FdEventHandlerPtr event,
                   StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = srequest->data;
 
     if(status < 0)
@@ -426,9 +387,6 @@ socksReadHandler(int status,
                  FdEventHandlerPtr event,
                  StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = srequest->data;
 
     if(status < 0)
@@ -467,9 +425,6 @@ socks5ReadHandlerAuth(int status,
                   FdEventHandlerPtr event,
                   StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = srequest->data;
 
     if(status < 0)
@@ -520,9 +475,6 @@ socks5ReadHandler(int status,
                   FdEventHandlerPtr event,
                   StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = srequest->data;
 
     if(status < 0)
@@ -578,9 +530,6 @@ socks5WriteHandler(int status,
                    FdEventHandlerPtr event,
                    StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = srequest->data;
 
     if(status < 0)
@@ -610,9 +559,6 @@ socks5ReadHandler2(int status,
                    FdEventHandlerPtr event,
                    StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     SocksRequestPtr request = srequest->data;
     authed = -1;
     if(status < 0)

@@ -334,7 +334,7 @@ localFilename(char *buf, int n, char *key, int len)
     return j;
 }
 
-void
+static void
 md5(unsigned char *restrict key, int len, unsigned char *restrict dst)
 {
     static MD5_CTX ctx;

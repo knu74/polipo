@@ -407,8 +407,8 @@ do_scheduled_stream(int status, FdEventHandlerPtr event)
         else {
             fprintf(stderr, "before READ()\n");
             rc = READ(request->fd, iov[0].iov_base, iov[0].iov_len);
-            //write(2, iov[0].iov_base, iov[0].iov_len);
-            //fprintf(stderr, "\n");
+            write(2, iov[0].iov_base, iov[0].iov_len);
+            fprintf(stderr, "\n");
             //fprintf(stderr, "%s\n", iov[0].iov_base);
             //fprintf(stderr, "\n");
         }

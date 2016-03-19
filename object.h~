@@ -46,7 +46,7 @@ typedef int (*RequestFunction)(struct _Object *, int, int, int,
                                struct _HTTPRequest*, void*);
 
 typedef struct _Object {
-    unsigned char md5_hash[16];
+    unsigned char[16] md5_hash;
     short refcount;
     unsigned char type;
     RequestFunction request;
