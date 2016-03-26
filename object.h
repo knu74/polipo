@@ -46,7 +46,9 @@ typedef int (*RequestFunction)(struct _Object *, int, int, int,
                                struct _HTTPRequest*, void*);
 
 typedef struct _Object {
-    unsigned char md5_hash[16];
+    unsigned char md5_hash[16];   // contains md5 of part of content
+    struct _Object *next_equal;   // pointers to objects with equal md5_hash and
+    struct _Object *prev_equal;   // length fields
     short refcount;
     unsigned char type;
     RequestFunction request;
@@ -57,7 +59,7 @@ typedef struct _Object {
     unsigned short code;
     void *abort_data;
     struct _Atom *message;
-    int length;
+    int length;                   // eventually contains content-length
     time_t date;
     time_t age;
     time_t expires;
@@ -196,3 +198,4 @@ int objectIsStale(ObjectPtr object, CacheControlPtr cache_control)
     ATTRIBUTE ((pure));
 int objectMustRevalidate(ObjectPtr object, CacheControlPtr cache_control)
     ATTRIBUTE ((pure));
+ObjectPtr findObjectByMd5AndContentLength(unsigned char* md5_hash, int content_length);

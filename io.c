@@ -37,9 +37,6 @@ AtomPtr proxyOutgoingAddress = NULL;
 void
 preinitIo()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
 #ifdef HAVE_IPV6_PREFER_TEMPADDR
     CONFIG_VARIABLE_SETTABLE(useTemporarySourceAddress, CONFIG_TRISTATE,
                              configIntSetter,
@@ -65,9 +62,6 @@ preinitIo()
 void
 initIo()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return;
 }
 
@@ -76,9 +70,6 @@ do_stream(int operation, int fd, int offset, char *buf, int len,
           int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
           void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(len > offset || (operation & (IO_END | IO_IMMEDIATE)));
     return schedule_stream(operation, fd, offset, 
                            NULL, 0, buf, len, NULL, 0, NULL, 0, NULL,
@@ -91,9 +82,6 @@ do_stream_2(int operation, int fd, int offset,
             int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
             void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(len + len2 > offset || (operation & (IO_END | IO_IMMEDIATE)));
     return schedule_stream(operation, fd, offset,
                            NULL, 0, buf, len, buf2, len2, NULL, 0, NULL,
@@ -106,9 +94,6 @@ do_stream_3(int operation, int fd, int offset,
             int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
             void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(len + len2 > offset || (operation & (IO_END | IO_IMMEDIATE)));
     return schedule_stream(operation, fd, offset,
                            NULL, 0, buf, len, buf2, len2, buf3, len3, NULL,
@@ -121,9 +106,6 @@ do_stream_h(int operation, int fd, int offset,
             int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
             void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(hlen + len > offset || (operation & (IO_END | IO_IMMEDIATE)));
     return schedule_stream(operation, fd, offset, 
                            header, hlen, buf, len, NULL, 0, NULL, 0, NULL,
@@ -135,9 +117,6 @@ do_stream_buf(int operation, int fd, int offset, char **buf_location, int len,
               int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
               void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert((len > offset || (operation & (IO_END | IO_IMMEDIATE)))
            && len <= CHUNK_SIZE);
     return schedule_stream(operation, fd, offset,
@@ -149,9 +128,6 @@ do_stream_buf(int operation, int fd, int offset, char **buf_location, int len,
 static int
 chunkHeaderLen(int i)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(i <= 0)
         return 0;
     if(i < 0x10)
@@ -169,9 +145,6 @@ chunkHeaderLen(int i)
 static int
 chunkHeader(char *buf, int buflen, int i)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n;
     if(i <= 0)
         return 0;
@@ -188,9 +161,6 @@ schedule_stream(int operation, int fd, int offset,
                 int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
                 void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     StreamRequestRec request;
     FdEventHandlerPtr event;
     int done;
@@ -261,9 +231,6 @@ static const char *endChunkTrailer = "\r\n0\r\n\r\n";
 int
 do_scheduled_stream(int status, FdEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     StreamRequestPtr request = (StreamRequestPtr)&event->data;
     int rc, done, i;
     struct iovec iov[6];
@@ -387,31 +354,15 @@ do_scheduled_stream(int status, FdEventHandlerPtr event)
     assert(i > 0);
 
     if((request->operation & IO_MASK) == IO_WRITE) {
-        if(i > 1) {
+        if(i > 1) 
             rc = WRITEV(request->fd, iov, i);
-        }
-        else {
+        else
             rc = WRITE(request->fd, iov[0].iov_base, iov[0].iov_len);
-        }
     } else {
-        if(i > 1) {
-            fprintf(stderr, "before READV()\n");
+        if(i > 1) 
             rc = READV(request->fd, iov, i);
-            for (int j = 0; j != i; ++j) {
-                //fprintf(stderr, "BEGIN iov[%d]:\n", j);
-              //  write(2, iov[j].iov_base, iov[j].iov_len);
-                //fprintf(stderr, "\nEND iov[%d]\n", j);
-            }
-            
-        }
-        else {
-            fprintf(stderr, "before READ()\n");
+        else
             rc = READ(request->fd, iov[0].iov_base, iov[0].iov_len);
-            //write(2, iov[0].iov_base, iov[0].iov_len);
-            //fprintf(stderr, "\n");
-            //fprintf(stderr, "%s\n", iov[0].iov_base);
-            //fprintf(stderr, "\n");
-        }
     }
 
     if(rc > 0) {
@@ -435,9 +386,6 @@ do_scheduled_stream(int status, FdEventHandlerPtr event)
 int
 streamRequestDone(StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int len123 = 
         request->len + request->len2 +
         ((request->operation & IO_BUF3) ? request->u.b.len3 : 0);
@@ -462,9 +410,6 @@ streamRequestDone(StreamRequestPtr request)
 static int
 serverSocket_outgoingIP(int fd)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
         int rc;
         unsigned long int bind_addr_saddr = inet_addr (proxyOutgoingAddress->string);
         struct sockaddr_in local_sockaddr_in[] = {{ 0 }};
@@ -484,9 +429,6 @@ serverSocket_outgoingIP(int fd)
 static int
 serverSocket(int af)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int fd, rc;
     if(af == 4) {
         fd = socket(PF_INET, SOCK_STREAM, 0);
@@ -535,9 +477,6 @@ do_connect(AtomPtr addr, int index, int port,
            int (*handler)(int, FdEventHandlerPtr, ConnectRequestPtr),
            void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ConnectRequestRec request;
     FdEventHandlerPtr event;
     int done, fd, af;
@@ -596,9 +535,6 @@ do_connect(AtomPtr addr, int index, int port,
 int
 do_scheduled_connect(int status, FdEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ConnectRequestPtr request = (ConnectRequestPtr)&event->data;
     AtomPtr addr = request->addr;
     int done;
@@ -714,9 +650,6 @@ do_accept(int fd,
           int (*handler)(int, FdEventHandlerPtr, AcceptRequestPtr),
           void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     FdEventHandlerPtr event;
     int done;
 
@@ -735,9 +668,6 @@ schedule_accept(int fd,
                 int (*handler)(int, FdEventHandlerPtr, AcceptRequestPtr),
                 void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     FdEventHandlerPtr event;
     AcceptRequestRec request;
     int done;
@@ -757,9 +687,6 @@ schedule_accept(int fd,
 int
 do_scheduled_accept(int status, FdEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     AcceptRequestPtr request = (AcceptRequestPtr)&event->data;
     int rc, done;
     socklen_t len;
@@ -786,9 +713,6 @@ create_listener(char *address, int port,
                 int (*handler)(int, FdEventHandlerPtr, AcceptRequestPtr),
                 void *data)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int fd, rc;
     int one = 1;
     int done;
@@ -906,9 +830,6 @@ create_listener(char *address, int port,
 int
 setNonblocking(int fd, int nonblocking)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
 #ifdef WIN32 /*MINGW*/
     return win32_setnonblocking(fd, nonblocking);
 #else
@@ -928,9 +849,6 @@ setNonblocking(int fd, int nonblocking)
 int
 setNodelay(int fd, int nodelay)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int val = nodelay ? 1 : 0;
     int rc;
     rc = setsockopt(fd, SOL_TCP, TCP_NODELAY, (char *)&val, sizeof(val));
@@ -943,9 +861,6 @@ setNodelay(int fd, int nodelay)
 int
 setV6only(int fd, int v6only)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int val = v6only ? 1 : 0;
     int rc;
     rc = setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
@@ -957,9 +872,6 @@ setV6only(int fd, int v6only)
 int
 setV6only(int fd, int v6only)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return 0;
 }
 #endif
@@ -973,9 +885,6 @@ typedef struct _LingeringClose {
 static int
 lingeringCloseTimeoutHandler(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     LingeringClosePtr l = *(LingeringClosePtr*)event->data;
     assert(l->timeout == event);
     l->timeout = NULL;
@@ -991,9 +900,6 @@ lingeringCloseTimeoutHandler(TimeEventHandlerPtr event)
 static int
 lingeringCloseHandler(int status, FdEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     LingeringClosePtr l = *(LingeringClosePtr*)event->data;
     char buf[17];
     int rc;
@@ -1026,9 +932,6 @@ lingeringCloseHandler(int status, FdEventHandlerPtr event)
 int
 lingeringClose(int fd)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc;
     LingeringClosePtr l;
 
@@ -1075,9 +978,6 @@ lingeringClose(int fd)
 NetAddressPtr
 parseNetAddress(AtomListPtr list)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     NetAddressPtr nl;
     int i, rc, rc6;
     char buf[100];
@@ -1167,9 +1067,6 @@ parseNetAddress(AtomListPtr list)
 static int
 bitmatch(const unsigned char *a, const unsigned char *b, int n)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(n >= 8) {
         if(memcmp(a, b, n / 8) != 0)
             return 0;
@@ -1188,9 +1085,6 @@ bitmatch(const unsigned char *a, const unsigned char *b, int n)
 static int
 match(int af, unsigned char *data, NetAddressPtr list)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
 #ifdef HAVE_IPv6
     static const unsigned char v6mapped[] =
@@ -1233,9 +1127,6 @@ match(int af, unsigned char *data, NetAddressPtr list)
 int
 netAddressMatch(int fd, NetAddressPtr list)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc;
     socklen_t len;
     struct sockaddr_in sain;

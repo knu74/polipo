@@ -335,13 +335,18 @@ localFilename(char *buf, int n, char *key, int len)
 }
 
 void
-md5(unsigned char *restrict key, int len, unsigned char *restrict dst)
+md5(unsigned char * key, int len, unsigned char * dst)
 {
     static MD5_CTX ctx;
     MD5Init(&ctx);
     MD5Update(&ctx, key, len);
     MD5Final(&ctx);
     memcpy(dst, ctx.digest, 16);
+}
+
+int 
+count_bytes_to_md5(int content_length) {
+    return (content_length < 200) ? content_length : 200;
 }
 
 /* Check whether a character can be stored in a filename.  This is

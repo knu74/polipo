@@ -51,9 +51,6 @@ static AtomListPtr censoredHeaders;
 void
 preinitHttpParser()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     CONFIG_VARIABLE_SETTABLE(censorReferer, CONFIG_TRISTATE, configIntSetter,
                              "Censor referer headers.");
     censoredHeaders = makeAtomList(NULL, 0);
@@ -70,9 +67,6 @@ preinitHttpParser()
 void
 initHttpParser()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
 #define A(name, value) name = internAtom(value); if(!name) goto fail;
     /* These must be in lower-case */
     A(atomConnection, "connection");
@@ -126,9 +120,6 @@ initHttpParser()
 static int
 getNextWord(const char *restrict buf, int i, int *x_return, int *y_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int x, y;
     while(buf[i] == ' ') i++;
     if(buf[i] == '\n' || buf[i] == '\r') return -1;
@@ -145,9 +136,6 @@ getNextWord(const char *restrict buf, int i, int *x_return, int *y_return)
 static int
 skipComment(const char *restrict buf, int i)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(buf[i] == '(');
 
     i++;
@@ -176,9 +164,6 @@ skipComment(const char *restrict buf, int i)
 static int
 skipWhitespace(const char *restrict buf, int i)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     while(1) {
         if(buf[i] == ' ' || buf[i] == '\t')
             i++;
@@ -203,9 +188,6 @@ skipWhitespace(const char *restrict buf, int i)
 static int
 getNextToken(const char *restrict buf, int i, int *x_return, int *y_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int x, y;
  again:
     while(buf[i] == ' ' || buf[i] == '\t')
@@ -263,9 +245,6 @@ static int
 getNextETag(const char * restrict buf, int i, 
             int *x_return, int *y_return, int *weak_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int weak = 0;
     int x, y;
     while(buf[i] == ' ' || buf[i] == '\t')
@@ -300,9 +279,6 @@ getNextTokenInList(const char *restrict buf, int i,
                    int *z_return, int *t_return,
                    int *end_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int j, x, y, z = -1, t = -1, end;
     j = getNextToken(buf, i, &x, &y);
     if(j < 0)
@@ -354,18 +330,12 @@ getNextTokenInList(const char *restrict buf, int i,
 static inline int
 token_compare(const char *buf, int start, int end, const char *s)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return (strcasecmp_n(s, buf + start, end - start) == 0);
 }
 
 static int
 skipEol(const char *restrict buf, int i)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     while(buf[i] == ' ')
         i++;
     if(buf[i] == '\n')
@@ -383,9 +353,6 @@ skipEol(const char *restrict buf, int i)
 static int
 skipToEol(const char *restrict buf, int i, int *start_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     while(buf[i] != '\n' && buf[i] != '\r')
         i++;
     if(buf[i] == '\n') {
@@ -406,9 +373,6 @@ static int
 getHeaderValue(const char *restrict buf, int start, 
                int *value_start_return, int *value_end_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i, j, k;
 
     while(buf[start] == ' ' || buf[start] == '\t')
@@ -433,9 +397,6 @@ httpParseClientFirstLine(const char *restrict buf, int offset,
                          AtomPtr *url_return,
                          int *version_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = 0;
     int x, y;
     int method;
@@ -503,9 +464,6 @@ httpParseServerFirstLine(const char *restrict buf,
                          int *version_return,
                          AtomPtr *message_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = 0;
     int x, y, eol;
     int status;
@@ -545,9 +503,6 @@ httpParseServerFirstLine(const char *restrict buf,
 static int
 parseInt(const char *restrict buf, int start, int *val_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = start, val = 0;
     if(!digit(buf[i]))
         return -1;
@@ -566,9 +521,6 @@ parseHeaderLine(const char *restrict buf, int start,
                 int *name_start_return, int *name_end_return,
                 int *value_start_return, int *value_end_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
     int name_start, name_end, value_start, value_end;
 
@@ -618,9 +570,6 @@ parseHeaderLine(const char *restrict buf, int start,
 int
 findEndOfHeaders(const char *restrict buf, int from, int to, int *body_return) 
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = from;
     int eol = 0;
     while(i < to) {
@@ -655,9 +604,6 @@ static int
 parseContentRange(const char *restrict buf, int i, 
                   int *from_return, int *to_return, int *full_len_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int j;
     int from, to, full_len;
 
@@ -705,9 +651,6 @@ static int
 parseRange(const char *restrict buf, int i, 
            int *from_return, int *to_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int j;
     int from, to;
 
@@ -746,9 +689,6 @@ parseCacheControl(const char *restrict buf,
                   int token_start, int token_end,
                   int v_start, int v_end, int *age_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(v_start <= 0 || !digit(buf[v_start])) {
         do_log(L_WARN, "Couldn't parse Cache-Control: ");
         do_log_n(L_WARN, buf + token_start,
@@ -762,9 +702,6 @@ parseCacheControl(const char *restrict buf,
 static int
 urlSameHost(const char *url1, int len1, const char *url2, int len2)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
     if(len1 < 7 || len2 < 7)
         return 0;
@@ -786,9 +723,6 @@ urlSameHost(const char *url1, int len1, const char *url2, int len2)
 static char *
 resize_hbuf(char *hbuf, int *size, char *hbuf_small)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int new_size = 2 * *size;
     char *new_hbuf;
 
@@ -827,9 +761,6 @@ httpParseHeaders(int client, AtomPtr url,
                  char **location_return, AtomPtr *via_return,
                  AtomPtr *auth_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int local = url ? urlIsLocal(url->string, url->length) : 0;
     char hbuf_small[512];
     char *hbuf = hbuf_small;
@@ -1449,9 +1380,6 @@ int
 httpFindHeader(AtomPtr header, const char *headers, int hlen,
                int *value_begin_return, int *value_end_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int len = header->length;
     int i = 0;
 
@@ -1482,9 +1410,6 @@ int
 parseUrl(const char *url, int len,
          int *x_return, int *y_return, int *port_return, int *z_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int x, y, z, port = -1, i = 0;
 
     if(len >= 7 && lwrcmp(url, "http://", 7) == 0) {
@@ -1534,18 +1459,12 @@ parseUrl(const char *url, int len,
 int
 urlIsLocal(const char *url, int len)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return (len > 0 && url[0] == '/');
 }
 
 int
 urlIsSpecial(const char *url, int len)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return (len >= 8 && memcmp(url, "/polipo/", 8) == 0);
 }
 
@@ -1553,9 +1472,6 @@ int
 parseChunkSize(const char *restrict buf, int i, int end,
                int *chunk_size_return)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int v, d;
     v = h2i(buf[i]);
     if(v < 0)
@@ -1607,9 +1523,6 @@ parseChunkSize(const char *restrict buf, int i, int end,
 int
 checkVia(AtomPtr name, AtomPtr via)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
     char *v;
     if(via == NULL || via->length == 0)

@@ -25,9 +25,6 @@ THE SOFTWARE.
 static int 
 httpAcceptAgain(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     FdEventHandlerPtr newevent;
     int fd = *(int*)event->data;
 
@@ -46,9 +43,6 @@ httpAcceptAgain(TimeEventHandlerPtr event)
 int
 httpAccept(int fd, FdEventHandlerPtr event, AcceptRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc;
     HTTPConnectionPtr connection;
     TimeEventHandlerPtr timeout;
@@ -127,9 +121,6 @@ httpAccept(int fd, FdEventHandlerPtr event, AcceptRequestPtr request)
 void
 httpClientAbort(HTTPConnectionPtr connection, int closed)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = connection->request;
 
     pokeFdEvent(connection->fd, -EDOSHUTDOWN, POLLOUT);
@@ -151,9 +142,6 @@ httpClientAbort(HTTPConnectionPtr connection, int closed)
 void
 httpClientFinish(HTTPConnectionPtr connection, int s)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = connection->request;
 
     assert(!(request && request->request 
@@ -304,9 +292,6 @@ static int httpClientDelayedShutdownHandler(TimeEventHandlerPtr);
 static int
 httpClientDelayedShutdown(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr handler;
 
     assert(connection->flags & CONN_READER);
@@ -331,9 +316,6 @@ static int
 httpClientShutdownHandler(int status,
                           FdEventHandlerPtr event, StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = request->data;
 
     assert(connection->flags & CONN_READER);
@@ -356,9 +338,6 @@ httpClientShutdownHandler(int status,
 static int 
 httpClientDelayedShutdownHandler(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = *(HTTPConnectionPtr*)event->data;
     assert(connection->flags & CONN_READER);
 
@@ -379,9 +358,6 @@ int
 httpClientHandler(int status,
                   FdEventHandlerPtr event, StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = request->data;
     int i, body;
     int bufsize = 
@@ -450,9 +426,6 @@ httpClientRawErrorHeaders(HTTPConnectionPtr connection,
                           int code, AtomPtr message,
                           int close, AtomPtr headers)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int fd = connection->fd;
     int n;
     char *url; int url_len;
@@ -512,9 +485,6 @@ int
 httpClientRawError(HTTPConnectionPtr connection, int code, AtomPtr message,
                    int close)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return httpClientRawErrorHeaders(connection, code, message, close, NULL);
 }
 
@@ -522,9 +492,6 @@ int
 httpClientNoticeErrorHeaders(HTTPRequestPtr request, int code, AtomPtr message,
                              AtomPtr headers)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(request->error_message)
         releaseAtom(request->error_message);
     if(request->error_headers)
@@ -539,18 +506,12 @@ httpClientNoticeErrorHeaders(HTTPRequestPtr request, int code, AtomPtr message,
 int
 httpClientNoticeError(HTTPRequestPtr request, int code, AtomPtr message)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return httpClientNoticeErrorHeaders(request, code, message, NULL);
 }
 
 int
 httpClientError(HTTPRequestPtr request, int code, AtomPtr message)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(request->error_message)
         releaseAtom(request->error_message);
     request->error_code = code;
@@ -567,9 +528,6 @@ httpClientError(HTTPRequestPtr request, int code, AtomPtr message)
 int
 httpClientLeanError(HTTPRequestPtr request, int code, AtomPtr message)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(request->error_message)
         releaseAtom(request->error_message);
     request->error_code = code;
@@ -582,9 +540,6 @@ int
 httpClientNewError(HTTPConnectionPtr connection, int method, int persist,
                    int code, AtomPtr message)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request;
     request = httpMakeRequest();
     if(request == NULL) {
@@ -610,9 +565,6 @@ httpErrorStreamHandler(int status,
                        FdEventHandlerPtr event,
                        StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = srequest->data;
 
     if(status == 0 && !streamRequestDone(srequest))
@@ -627,9 +579,6 @@ httpErrorNocloseStreamHandler(int status,
                               FdEventHandlerPtr event,
                               StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = srequest->data;
 
     if(status == 0 && !streamRequestDone(srequest))
@@ -644,9 +593,6 @@ httpErrorNofinishStreamHandler(int status,
                                FdEventHandlerPtr event,
                                StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(status == 0 && !streamRequestDone(srequest))
         return 0;
 
@@ -657,9 +603,6 @@ int
 httpClientHandlerHeaders(FdEventHandlerPtr event, StreamRequestPtr srequest,
                          HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request;
     int rc;
     int method, version;
@@ -737,9 +680,6 @@ httpClientHandlerHeaders(FdEventHandlerPtr event, StreamRequestPtr srequest,
 static int
 httpClientRequestDelayed(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = *(HTTPRequestPtr*)event->data;
     AtomPtr url;
     url = internAtomN(request->object->key, request->object->key_size);
@@ -755,9 +695,6 @@ httpClientRequestDelayed(TimeEventHandlerPtr event)
 int
 delayedHttpClientRequest(HTTPRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr event;
     event = scheduleTimeEvent(-1, httpClientRequestDelayed,
                               sizeof(request), &request);
@@ -903,9 +840,6 @@ httpClientRequestContinue(int forbidden_code, AtomPtr url,
                           AtomPtr forbidden_message, AtomPtr forbidden_headers,
                           void *closure)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = (HTTPRequestPtr)closure;
     HTTPConnectionPtr connection = request->connection;
     RequestFunction requestfn;
@@ -1021,9 +955,6 @@ static int httpClientDelayed(TimeEventHandlerPtr handler);
 int
 httpClientDiscardBody(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr handler;
 
     assert(connection->reqoffset == 0);
@@ -1095,9 +1026,6 @@ httpClientDiscardBody(HTTPConnectionPtr connection)
 static int
 httpClientDelayed(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
      HTTPConnectionPtr connection = *(HTTPConnectionPtr*)event->data;
 
      /* IO_NOTNOW is unfortunate, but needed to avoid starvation if a
@@ -1128,9 +1056,6 @@ int
 httpClientDiscardHandler(int status,
                          FdEventHandlerPtr event, StreamRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = request->data;
 
     assert(connection->flags & CONN_READER);
@@ -1151,9 +1076,6 @@ httpClientDiscardHandler(int status,
 int
 httpClientNoticeRequest(HTTPRequestPtr request, int novalidate)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = request->connection;
     ObjectPtr object = request->object;
     int serveNow = (request == connection->request);
@@ -1351,9 +1273,6 @@ httpClientNoticeRequest(HTTPRequestPtr request, int novalidate)
 static int
 httpClientNoticeRequestDelayed(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = *(HTTPRequestPtr*)event->data;
     httpClientNoticeRequest(request, 0);
     return 1;
@@ -1362,9 +1281,6 @@ httpClientNoticeRequestDelayed(TimeEventHandlerPtr event)
 int
 delayedHttpClientNoticeRequest(HTTPRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr event;
     event = scheduleTimeEvent(-1, httpClientNoticeRequestDelayed,
                               sizeof(request), &request);
@@ -1376,9 +1292,6 @@ delayedHttpClientNoticeRequest(HTTPRequestPtr request)
 int
 httpClientContinueDelayed(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     static char httpContinue[] = "HTTP/1.1 100 Continue\r\n\r\n";
     HTTPConnectionPtr connection = *(HTTPConnectionPtr*)event->data;
 
@@ -1390,9 +1303,6 @@ httpClientContinueDelayed(TimeEventHandlerPtr event)
 int
 delayedHttpClientContinue(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr event;
     event = scheduleTimeEvent(-1, httpClientContinueDelayed,
                               sizeof(connection), &connection);
@@ -1404,9 +1314,6 @@ delayedHttpClientContinue(HTTPConnectionPtr connection)
 int
 httpClientGetHandler(int status, ConditionHandlerPtr chandler)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = *(HTTPRequestPtr*)chandler->data;
     HTTPConnectionPtr connection = request->connection;
     ObjectPtr object = request->object;
@@ -1566,9 +1473,6 @@ httpClientGetHandler(int status, ConditionHandlerPtr chandler)
 int
 httpClientSideRequest(HTTPRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = request->connection;
 
     if(request->from < 0 || request->to >= 0) {
@@ -1605,9 +1509,6 @@ httpClientSideHandler(int status,
                       FdEventHandlerPtr event,
                       StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = srequest->data;
     HTTPRequestPtr request = connection->request;
     HTTPRequestPtr requestee;
@@ -1675,9 +1576,6 @@ httpClientSideHandler(int status,
 int 
 httpServeObject(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = connection->request;
     ObjectPtr object = request->object;
     int i = request->from / CHUNK_SIZE;
@@ -1929,9 +1827,6 @@ httpServeObject(HTTPConnectionPtr connection)
 static int
 httpServeObjectDelayed(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = *(HTTPConnectionPtr*)event->data;
     httpServeObject(connection);
     return 1;
@@ -1940,9 +1835,6 @@ httpServeObjectDelayed(TimeEventHandlerPtr event)
 int
 delayedHttpServeObject(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr event;
 
     assert(connection->request->object->chunks[connection->request->from / 
@@ -1959,9 +1851,6 @@ httpServeObjectFinishHandler(int status,
                              FdEventHandlerPtr event,
                              StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = srequest->data;
     HTTPRequestPtr request = connection->request;
 
@@ -1985,9 +1874,6 @@ httpServeObjectFinishHandler(int status,
 int
 httpServeChunk(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = connection->request;
     ObjectPtr object = request->object;
     int i = connection->offset / CHUNK_SIZE;
@@ -2144,9 +2030,6 @@ httpServeChunk(HTTPConnectionPtr connection)
 static int
 httpServeChunkDelayed(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = *(HTTPConnectionPtr*)event->data;
     httpServeChunk(connection);
     return 1;
@@ -2155,9 +2038,6 @@ httpServeChunkDelayed(TimeEventHandlerPtr event)
 int
 delayedHttpServeChunk(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr event;
     event = scheduleTimeEvent(-1, httpServeChunkDelayed,
                               sizeof(connection), &connection);
@@ -2168,9 +2048,6 @@ delayedHttpServeChunk(HTTPConnectionPtr connection)
 int
 httpServeObjectHandler(int status, ConditionHandlerPtr chandler)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = *(HTTPConnectionPtr*)chandler->data;
     HTTPRequestPtr request = connection->request;
     int rc;
@@ -2198,9 +2075,6 @@ httpServeObjectStreamHandlerCommon(int kind, int status,
                                    FdEventHandlerPtr event,
                                    StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = srequest->data;
     HTTPRequestPtr request = connection->request;
     int condition_result = httpCondition(request->object, request->condition);
@@ -2269,9 +2143,6 @@ httpServeObjectStreamHandler(int status,
                              FdEventHandlerPtr event,
                              StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return httpServeObjectStreamHandlerCommon(1, status, event, srequest);
 }
 
@@ -2280,8 +2151,5 @@ httpServeObjectStreamHandler2(int status,
                               FdEventHandlerPtr event,
                               StreamRequestPtr srequest)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return httpServeObjectStreamHandlerCommon(2, status, event, srequest);
 }

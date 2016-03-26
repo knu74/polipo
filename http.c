@@ -67,9 +67,6 @@ static int timeoutSetter(ConfigVariablePtr var, void *value);
 void
 preinitHttp()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     proxyAddress = internAtom("127.0.0.1");
     CONFIG_VARIABLE_SETTABLE(disableProxy, CONFIG_BOOLEAN, configIntSetter,
                              "Whether to be a web server only.");
@@ -118,9 +115,6 @@ preinitHttp()
 static int
 timeoutSetter(ConfigVariablePtr var, void *value)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     configIntSetter(var, value);
     if(clientTimeout <= serverTimeout)
         clientTimeout = serverTimeout + 1;
@@ -130,9 +124,6 @@ timeoutSetter(ConfigVariablePtr var, void *value)
 void
 initHttp()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char *buf = NULL;
     int namelen;
     int n;
@@ -259,9 +250,6 @@ initHttp()
 int
 httpSetTimeout(HTTPConnectionPtr connection, int secs)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     TimeEventHandlerPtr new;
 
     if(connection->timeout)
@@ -287,9 +275,6 @@ httpSetTimeout(HTTPConnectionPtr connection, int secs)
 int 
 httpTimeoutHandler(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection = *(HTTPConnectionPtr*)event->data;
 
     if(connection->fd >= 0) {
@@ -307,9 +292,6 @@ int
 httpWriteObjectHeaders(char *buf, int offset, int len,
                        ObjectPtr object, int from, int to)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n = offset;
     CacheControlRec cache_control;
 
@@ -407,9 +389,6 @@ static int
 cachePrintSeparator(char *buf, int offset, int len,
                     int subsequent)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n = offset;
     if(subsequent)
         n = snnprintf(buf, offset, len, ", ");
@@ -422,9 +401,6 @@ int
 httpPrintCacheControl(char *buf, int offset, int len,
                       int flags, CacheControlPtr cache_control)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n = offset;
     int sub = 0;
 
@@ -498,9 +474,6 @@ httpPrintCacheControl(char *buf, int offset, int len,
 char *
 httpMessage(int code)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     switch(code) {
     case 200:
         return "Okay";
@@ -536,9 +509,6 @@ httpMessage(int code)
 int
 htmlString(char *buf, int n, int len, char *s, int slen)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = 0;
     while(i < slen && n + 5 < len) {
         switch(s[i]) {
@@ -569,9 +539,6 @@ htmlString(char *buf, int n, int len, char *s, int slen)
 void
 htmlPrint(FILE *out, char *s, int slen)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
     for(i = 0; i < slen; i++) {
         switch(s[i]) {
@@ -593,9 +560,6 @@ htmlPrint(FILE *out, char *s, int slen)
 HTTPConnectionPtr
 httpMakeConnection()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConnectionPtr connection;
     connection = malloc(sizeof(HTTPConnectionRec));
     if(connection == NULL)
@@ -629,9 +593,6 @@ httpMakeConnection()
 void
 httpDestroyConnection(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(connection->flags == 0);
     httpConnectionDestroyBuf(connection);
     assert(!connection->request);
@@ -645,9 +606,6 @@ httpDestroyConnection(HTTPConnectionPtr connection)
 void
 httpConnectionDestroyBuf(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(connection->buf) {
         if(connection->flags & CONN_BIGBUF)
             free(connection->buf);
@@ -661,9 +619,6 @@ httpConnectionDestroyBuf(HTTPConnectionPtr connection)
 void
 httpConnectionDestroyReqbuf(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(connection->reqbuf) {
         if(connection->flags & CONN_BIGREQBUF)
             free(connection->reqbuf);
@@ -677,9 +632,6 @@ httpConnectionDestroyReqbuf(HTTPConnectionPtr connection)
 HTTPRequestPtr 
 httpMakeRequest()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request;
     request = malloc(sizeof(HTTPRequestRec));
     if(request == NULL)
@@ -709,9 +661,6 @@ httpMakeRequest()
 void
 httpDestroyRequest(HTTPRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(request->object)
         releaseObject(request->object);
     if(request->condition)
@@ -729,9 +678,6 @@ httpDestroyRequest(HTTPRequestPtr request)
 void
 httpQueueRequest(HTTPConnectionPtr connection, HTTPRequestPtr request)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     assert(request->next == NULL && request->connection == NULL);
     request->connection = connection;
     if(connection->request_last) {
@@ -748,9 +694,6 @@ httpQueueRequest(HTTPConnectionPtr connection, HTTPRequestPtr request)
 HTTPRequestPtr
 httpDequeueRequest(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPRequestPtr request = connection->request;
     if(request) {
         assert(connection->request_last);
@@ -764,9 +707,6 @@ httpDequeueRequest(HTTPConnectionPtr connection)
 int
 httpConnectionBigify(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char *bigbuf;
     assert(!(connection->flags & CONN_BIGBUF));
 
@@ -788,9 +728,6 @@ httpConnectionBigify(HTTPConnectionPtr connection)
 int
 httpConnectionBigifyReqbuf(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char *bigbuf;
     assert(!(connection->flags & CONN_BIGREQBUF));
 
@@ -812,9 +749,6 @@ httpConnectionBigifyReqbuf(HTTPConnectionPtr connection)
 int
 httpConnectionUnbigify(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char *buf;
     assert(connection->flags & CONN_BIGBUF);
     assert(connection->len < CHUNK_SIZE);
@@ -833,9 +767,6 @@ httpConnectionUnbigify(HTTPConnectionPtr connection)
 int
 httpConnectionUnbigifyReqbuf(HTTPConnectionPtr connection)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char *buf;
     assert(connection->flags & CONN_BIGREQBUF);
     assert(connection->reqlen < CHUNK_SIZE);
@@ -854,9 +785,6 @@ httpConnectionUnbigifyReqbuf(HTTPConnectionPtr connection)
 HTTPConditionPtr 
 httpMakeCondition()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     HTTPConditionPtr condition;
     condition = malloc(sizeof(HTTPConditionRec));
     if(condition == NULL)
@@ -872,9 +800,6 @@ httpMakeCondition()
 void
 httpDestroyCondition(HTTPConditionPtr condition)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(condition->inm)
         free(condition->inm);
     if(condition->im)
@@ -887,9 +812,6 @@ httpDestroyCondition(HTTPConditionPtr condition)
 int
 httpCondition(ObjectPtr object, HTTPConditionPtr condition)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc = CONDITION_MATCH;
 
     assert(!(object->flags & OBJECT_INITIAL));
@@ -934,9 +856,6 @@ httpWriteErrorHeaders(char *buf, int size, int offset, int do_body,
                       int code, AtomPtr message, int close, AtomPtr headers,
                       char *url, int url_len, char *etag)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n, m, i;
     char *body;
     char htmlMessage[100];
@@ -1052,9 +971,6 @@ httpWriteErrorHeaders(char *buf, int size, int offset, int do_body,
 AtomListPtr
 urlDecode(char *buf, int n)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char mybuf[500];
     int i, j = 0;
     AtomListPtr list;
@@ -1104,9 +1020,6 @@ urlDecode(char *buf, int n)
 void
 httpTweakCachability(ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int code = object->code;
 
     if((object->cache_control & CACHE_AUTHORIZATION) &&
@@ -1154,9 +1067,6 @@ httpTweakCachability(ObjectPtr object)
 int
 httpHeaderMatch(AtomPtr header, AtomPtr headers1, AtomPtr headers2)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc1, b1, e1, rc2, b2, e2;
 
     /* Short cut if both sets of headers are identical */

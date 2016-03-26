@@ -46,20 +46,9 @@ int maxObjectsWhenIdle = 32;
 int idleTime = 20;
 int dontCacheCookies = 0;
 
-
-ObjectPtr getObjectList() {
-    return object_list;
-}
-
-
-
-
 void
 preinitObject()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     CONFIG_VARIABLE_SETTABLE(idleTime, CONFIG_TIME, configIntSetter,
                              "Time to remain idle before writing out.");
     CONFIG_VARIABLE_SETTABLE(maxWriteoutWhenIdle, CONFIG_INT, configIntSetter,
@@ -93,9 +82,6 @@ preinitObject()
 void
 initObject()
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int q;
     if(objectHighMark < 16) {
         objectHighMark = 16;
@@ -139,9 +125,6 @@ initObject()
 ObjectPtr
 findObject(int type, const void *key, int key_size)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int h;
     ObjectPtr object;
 
@@ -175,12 +158,22 @@ findObject(int type, const void *key, int key_size)
 }
 
 ObjectPtr
+findObjectByMd5AndContentLength(unsigned char* md5_hash, int content_length) {
+    ObjectPtr current = object_list;
+    // TODO: linear search should be replaced by using hash table
+    while (current) {
+        if (current->length == content_length && !memcmp(current->md5_hash, md5_hash, 16)) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+ObjectPtr
 makeObject(int type, const void *key, int key_size, int public, int fromdisk,
            RequestFunction request, void* request_closure)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ObjectPtr object;
     int h;
 
@@ -248,6 +241,9 @@ makeObject(int type, const void *key, int key_size, int public, int fromdisk,
         object->next = NULL;
         object->previous = NULL;
     }
+    memset(object->md5_hash, 0, 16);
+    object->next_equal = NULL;
+    object->prev_equal = NULL;
     object->abort_data = NULL;
     object->code = 0;
     object->message = NULL;
@@ -283,9 +279,6 @@ makeObject(int type, const void *key, int key_size, int public, int fromdisk,
 void 
 objectMetadataChanged(ObjectPtr object, int revalidate)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     if(revalidate) {
         revalidateDiskEntry(object);
     } else {
@@ -298,9 +291,6 @@ objectMetadataChanged(ObjectPtr object, int revalidate)
 ObjectPtr
 retainObject(ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     do_log(D_REFCOUNT, "O 0x%lx %d++\n",
            (unsigned long)object, object->refcount);
     object->refcount++;
@@ -310,9 +300,6 @@ retainObject(ObjectPtr object)
 void
 releaseObject(ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     do_log(D_REFCOUNT, "O 0x%lx %d--\n",
            (unsigned long)object, object->refcount);
     object->refcount--;
@@ -327,9 +314,6 @@ releaseObject(ObjectPtr object)
 void
 releaseNotifyObject(ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     do_log(D_REFCOUNT, "O 0x%lx %d--\n",
            (unsigned long)object, object->refcount);
     object->refcount--;
@@ -346,9 +330,6 @@ releaseNotifyObject(ObjectPtr object)
 void 
 lockChunk(ObjectPtr object, int i)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     do_log(D_LOCK, "Lock 0x%lx[%d]: ", (unsigned long)object, i);
     assert(i >= 0);
     if(i >= object->numchunks)
@@ -360,9 +341,6 @@ lockChunk(ObjectPtr object, int i)
 void 
 unlockChunk(ObjectPtr object, int i)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s: %d\n", __FILE__, __LINE__);
-#endif
     do_log(D_LOCK, "Unlock 0x%lx[%d]: ", (unsigned long)object, i);
     assert(i >= 0 && i < object->numchunks);
     assert(object->chunks[i].locked > 0);
@@ -373,9 +351,6 @@ unlockChunk(ObjectPtr object, int i)
 int
 objectSetChunks(ObjectPtr object, int numchunks)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int n;
 
     if(numchunks <= object->numchunks)
@@ -411,9 +386,6 @@ objectSetChunks(ObjectPtr object, int numchunks)
 ObjectPtr
 objectPartial(ObjectPtr object, int length, struct _Atom *headers)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     object->headers = headers;
 
     if(length >= 0) {
@@ -437,9 +409,6 @@ objectPartial(ObjectPtr object, int length, struct _Atom *headers)
 static int
 objectAddChunk(ObjectPtr object, const char *data, int offset, int plen)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = offset / CHUNK_SIZE;
     int rc;
 
@@ -480,9 +449,6 @@ objectAddChunk(ObjectPtr object, const char *data, int offset, int plen)
 static int
 objectAddChunkEnd(ObjectPtr object, const char *data, int offset, int plen)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i = offset / CHUNK_SIZE;
     int rc;
 
@@ -527,9 +493,6 @@ objectAddChunkEnd(ObjectPtr object, const char *data, int offset, int plen)
 int
 objectAddData(ObjectPtr object, const char *data, int offset, int len)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int rc;
 
     do_log(D_OBJECT_DATA, "Adding data to 0x%lx (%d) at %d: %d bytes\n",
@@ -586,9 +549,6 @@ objectAddData(ObjectPtr object, const char *data, int offset, int len)
 void
 objectPrintf(ObjectPtr object, int offset, const char *format, ...)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     char *buf;
     int rc;
 
@@ -611,9 +571,6 @@ objectPrintf(ObjectPtr object, int offset, const char *format, ...)
 int 
 objectHoleSize(ObjectPtr object, int offset)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int size = 0, i;
 
     if(offset < 0 || offset / CHUNK_SIZE >= object->numchunks)
@@ -650,9 +607,6 @@ objectHoleSize(ObjectPtr object, int offset)
 int
 objectHasData(ObjectPtr object, int from, int to)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int first, last, i, upto;
 
     if(to < 0) {
@@ -701,9 +655,6 @@ objectHasData(ObjectPtr object, int from, int to)
 void
 destroyObject(ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
 
     assert(object->refcount == 0 && !object->requestor);
@@ -738,9 +689,6 @@ destroyObject(ObjectPtr object)
 void
 privatiseObject(ObjectPtr object, int linear) 
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i, h;
     if(!(object->flags & OBJECT_PUBLIC)) {
         if(linear)
@@ -792,9 +740,6 @@ privatiseObject(ObjectPtr object, int linear)
 void
 abortObject(ObjectPtr object, int code, AtomPtr message)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int i;
 
     assert(code != 0);
@@ -828,9 +773,6 @@ abortObject(ObjectPtr object, int code, AtomPtr message)
 void 
 supersedeObject(ObjectPtr object)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     object->flags |= OBJECT_SUPERSEDED;
     destroyDiskEntry(object, 1);
     privatiseObject(object, 0);
@@ -840,9 +782,6 @@ supersedeObject(ObjectPtr object)
 void
 notifyObject(ObjectPtr object) 
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     retainObject(object);
     signalCondition(&object->condition);
     releaseObject(object);
@@ -851,18 +790,12 @@ notifyObject(ObjectPtr object)
 int
 discardObjectsHandler(TimeEventHandlerPtr event)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     return discardObjects(0, 0);
 }
 
 void
 writeoutObjects(int all)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ObjectPtr object = object_list;
     int bytes;
     int objects;
@@ -894,9 +827,6 @@ writeoutObjects(int all)
 int
 discardObjects(int all, int force)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     ObjectPtr object;
     int i;
     static int in_discardObjects = 0;
@@ -1013,9 +943,6 @@ CacheControlRec no_cache_control = {0, -1, -1, -1, -1};
 int
 objectIsStale(ObjectPtr object, CacheControlPtr cache_control)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int stale = 0x7FFFFFFF;
     int flags;
     int max_age, s_maxage;
@@ -1100,9 +1027,6 @@ objectIsStale(ObjectPtr object, CacheControlPtr cache_control)
 int
 objectMustRevalidate(ObjectPtr object, CacheControlPtr cache_control)
 {
-#ifdef PRINT_TRACES
-    fprintf(stderr, "%s (%s: %d)\n", __func__, __FILE__, __LINE__);
-#endif
     int flags;
 
     if(cache_control == NULL)
