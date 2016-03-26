@@ -2324,7 +2324,7 @@ httpServerHandlerHeaders(int eof,
     }
     
     if (already_in_cache) {
-        httpServerFinish(connection, 0, bytes_read);
+        httpServerFinish(connection, 1, bytes_read);
         return 1;
     }
 

@@ -359,10 +359,14 @@ do_scheduled_stream(int status, FdEventHandlerPtr event)
         else
             rc = WRITE(request->fd, iov[0].iov_base, iov[0].iov_len);
     } else {
-        if(i > 1) 
+        if(i > 1) {
+            fprintf(stderr, "READV()\n");
             rc = READV(request->fd, iov, i);
-        else
+        }
+        else {
+            fprintf(stderr, "READ\n");
             rc = READ(request->fd, iov[0].iov_base, iov[0].iov_len);
+        }
     }
 
     if(rc > 0) {
