@@ -673,14 +673,22 @@ destroyObject(ObjectPtr object)
         if(object->headers) releaseAtom(object->headers);
         if(object->etag) free(object->etag);
         if(object->via) releaseAtom(object->via);
-        for(i = 0; i < object->numchunks; i++) {
-            assert(!object->chunks[i].locked);
-            if(object->chunks[i].data)
-                dispose_chunk(object->chunks[i].data);
-            object->chunks[i].data = NULL;
-            object->chunks[i].size = 0;
+        if (object->next_equal == NULL && object->prev_equal == NULL) {
+            for(i = 0; i < object->numchunks; i++) {
+                assert(!object->chunks[i].locked);
+                if(object->chunks[i].data)
+                    dispose_chunk(object->chunks[i].data);
+                object->chunks[i].data = NULL;
+                object->chunks[i].size = 0;
+            }
+            if(object->chunks) free(object->chunks);
         }
-        if(object->chunks) free(object->chunks);
+        if (object->next_equal) {
+            object->next_equal->prev_equal = object->prev_equal;
+        }
+        if (object->prev_equal) {
+            object->prev_equal->next_equal = object->next_equal;
+        }
         privateObjectCount--;
         free(object);
     }

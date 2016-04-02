@@ -1944,15 +1944,15 @@ httpServerHandlerHeaders(int eof,
     // count of bytes of payload for which we compute md5:
     int bytes_to_md5 = count_bytes_to_md5(content_length);
     int already_in_cache = 0;
-    fprintf(stderr, "code: %d\n", code);
     if (code == 200) {
         // while connection->buf has not enough bytes in payload for md5
-        while (connection->len < bytes_in_headers + bytes_to_md5) { 
+        if (connection->len < bytes_in_headers + bytes_to_md5) { 
             // TODO: direct read() call should be replaced by scheduling
-           int tmp = read(connection->fd, 
-                          &connection->buf[connection->len], 
-                          bytes_in_headers + bytes_to_md5 - connection->len);
-           connection->len += tmp;
+            int tmp = read(connection->fd, 
+                           &connection->buf[connection->len], 
+                           bytes_in_headers + bytes_to_md5 - connection->len);
+  
+            connection->len += tmp;
         }
         
         md5(&connection->buf[bytes_in_headers], bytes_to_md5, object->md5_hash);
