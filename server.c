@@ -1392,7 +1392,7 @@ httpServerReply(HTTPConnectionPtr connection, int immediate)
     httpSetTimeout(connection, serverTimeout);
     do_stream_buf(IO_READ | (immediate ? IO_IMMEDIATE : 0) | IO_NOTNOW,
                   connection->fd, connection->len,
-                  &connection->buf, COUNT_FOR_FIRST_READ,
+                  &connection->buf, CHUNK_SIZE,
                   httpServerReplyHandler, connection);
 }
 
@@ -1944,24 +1944,40 @@ httpServerHandlerHeaders(int eof,
     // count of bytes of payload for which we compute md5:
     int bytes_to_md5 = count_bytes_to_md5(content_length);
     int already_in_cache = 0;
-    if (code == 200) {
+    if (code == 200 && content_length != -1) {
         // while connection->buf has not enough bytes in payload for md5
-        if (connection->len < bytes_in_headers + bytes_to_md5) { 
+        while (connection->len < bytes_in_headers + bytes_to_md5) { 
             // TODO: direct read() call should be replaced by scheduling
             int tmp = read(connection->fd, 
                            &connection->buf[connection->len], 
                            bytes_in_headers + bytes_to_md5 - connection->len);
-  
-            connection->len += tmp;
+            if (tmp > 0) {
+                connection->len += tmp;
+            }
+            //fprintf(stderr, "cycle\n");
         }
         
         md5(&connection->buf[bytes_in_headers], bytes_to_md5, object->md5_hash);
         ObjectPtr found_object = findObjectByMd5AndContentLength(object->md5_hash, 
-                                                              content_length);
-        fprintf(stdout, "HERE\n");
+                                                              content_length); 
+        here:                                                   
         if (found_object) {
-            fprintf(stdout, "FOUND\n");
-            fflush(stdout);
+            int keylen = strlen(found_object->key);
+            if (keylen < 4) goto here;
+            if (found_object->key[keylen - 2] == 'j' &&
+                found_object->key[keylen - 1] == 's') {
+                 found_object = NULL;
+                 goto here;   
+            }
+            if (found_object->key[keylen - 3] == 'c' &&
+                found_object->key[keylen - 2] == 's' &&
+                found_object->key[keylen - 1] == 's') {
+                found_object = NULL;
+                goto here;
+            }
+            
+            fprintf(stderr, "FOUND\n");
+            fprintf(stderr, "%s\n", found_object->key);
             already_in_cache = 1;
             ObjectPtr current = found_object;
             // TODO: linear traversal should be replaced
@@ -1976,6 +1992,9 @@ httpServerHandlerHeaders(int eof,
         }
     }
     int bytes_read = connection->len;
+
+   // fprintf(stderr, "print_objects():\n");
+   // print_objects();
 
     if(date < 0)
         date = current_time.tv_sec;
@@ -2323,10 +2342,10 @@ httpServerHandlerHeaders(int eof,
         notifyObject(object);
     }
     
-    if (already_in_cache) {
+ /*   if (already_in_cache) {
         httpServerFinish(connection, 1, bytes_read);
         return 1;
-    }
+    }*/
 
     if(!expect_body) {
         httpServerFinish(connection, 0, rc);
@@ -2423,6 +2442,11 @@ httpServerHandlerHeaders(int eof,
             return 1;
         }
     } else {
+        if (already_in_cache) {
+            fprintf(stderr, "already_in_cache\n");
+            httpServerFinish(connection, 1, connection->len);
+            return 1;
+        }
         return httpServerReadData(connection, 1);
     }
     return 0;

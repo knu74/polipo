@@ -46,6 +46,14 @@ int maxObjectsWhenIdle = 32;
 int idleTime = 20;
 int dontCacheCookies = 0;
 
+void print_objects() {
+    ObjectPtr current = object_list;
+    while (current != NULL) {
+        fprintf(stderr, "%s\n", current->key);
+        current = current->next;
+    }
+}
+
 void
 preinitObject()
 {
@@ -1061,4 +1069,3 @@ objectMustRevalidate(ObjectPtr object, CacheControlPtr cache_control)
 
     return 0;
 }
-

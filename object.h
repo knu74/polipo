@@ -199,3 +199,4 @@ int objectIsStale(ObjectPtr object, CacheControlPtr cache_control)
 int objectMustRevalidate(ObjectPtr object, CacheControlPtr cache_control)
     ATTRIBUTE ((pure));
 ObjectPtr findObjectByMd5AndContentLength(unsigned char* md5_hash, int content_length);
+void print_objects();
